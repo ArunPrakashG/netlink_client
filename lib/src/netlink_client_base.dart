@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
-import 'package:netlink_client/src/constants.dart';
-import 'package:netlink_client/src/endpoint_manager.dart';
+
+import 'constants.dart';
+import 'endpoint_manager.dart';
 
 class NetlinkClient {
   final EndpointManager endpointManager = EndpointManager(baseUrl);
@@ -43,7 +44,8 @@ class NetlinkClient {
     if (response.data!
         .contains('ERROR:You have entered wrong username or password thrice')) {
       throw Exception(
-          'You have entered wrong username or password thrice; Please try again after 15 minutes');
+        'You have entered wrong username or password thrice; Please try again after 15 minutes',
+      );
     }
 
     return response.statusCode == 200;
@@ -53,8 +55,6 @@ class NetlinkClient {
     final response = await _client.postUri<String>(
       endpointManager.logout,
     );
-
-    print(response.data);
 
     return response.statusCode == 200;
   }
@@ -83,18 +83,21 @@ class NetlinkClient {
     final document = parse(response.data);
     final scriptTags = document.getElementsByTagName('script');
 
-    final createCodeScript = scriptTags
-        .map((script) => script.innerHtml)
-        .firstWhere((innerHtml) => innerHtml.contains('function CreateCode()'),
-            orElse: () => '');
+    final createCodeScript =
+        scriptTags.map((script) => script.innerHtml).firstWhere(
+              (innerHtml) => innerHtml.contains('function CreateCode()'),
+              orElse: () => '',
+            );
 
     // Extract the value by parsing the JavaScript code
     final lines = LineSplitter.split(createCodeScript);
 
     return lines
-        .where((line) => line
-            .trim()
-            .startsWith("document.getElementById('check_code').value"))
+        .where(
+          (line) => line
+              .trim()
+              .startsWith("document.getElementById('check_code').value"),
+        )
         .first
         .split('=')
         .last

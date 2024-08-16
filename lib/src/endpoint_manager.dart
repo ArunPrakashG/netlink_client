@@ -1,7 +1,7 @@
 final class EndpointManager {
-  final Uri baseUrl;
-
   const EndpointManager(this.baseUrl);
+
+  final Uri baseUrl;
 
   Uri get login => baseUrl.resolve('/boaform/admin/formLogin');
   Uri get logout => baseUrl.resolve('/boaform/admin/formLogout');
